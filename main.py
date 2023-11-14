@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 
 url = 'http://ws.bus.go.kr/api/rest/buspos/getLowBusPosByRtid'  # 저상버스위치조회
 params = {
-    'serviceKey': 'OPS4fohR6WPWKsxqowtr+4b4tg053PyFaFhn3iIo0pyXfMA1Bsyx4x1j7P0TOmVbA67Y5V/UrGoQwyCO83K4LQ==',
+    'serviceKey': '서비스키',
     'busRouteId': '124000038',
     'resultType': 'xml'
 }
