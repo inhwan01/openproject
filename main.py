@@ -1,32 +1,37 @@
 import requests
-from json.decoder import JSONDecodeError
+import xml.etree.ElementTree as ET
 
-url = 'http://ws.bus.go.kr/api/rest/buspos/getLowBusPosByRtid' #저상버스위치조회
-params ={'serviceKey' : '서비스 키', 'busRouteId' : '124000038', 'resultType': 'json'}
+url = 'http://ws.bus.go.kr/api/rest/buspos/getLowBusPosByRtid'  # 저상버스위치조회
+params = {
+    'serviceKey': 'OPS4fohR6WPWKsxqowtr+4b4tg053PyFaFhn3iIo0pyXfMA1Bsyx4x1j7P0TOmVbA67Y5V/UrGoQwyCO83K4LQ==',
+    'busRouteId': '124000038',
+    'resultType': 'xml'
+}
 
 response = requests.get(url, params=params)
 
 if response.status_code == 200:
-   try:
-        # JSON 형식의 응답을 파싱
-        data = response.json()
+    try:
+        # XML 형식의 응답을 파싱
+        root = ET.fromstring(response.text)
 
-        # 조회 결과 확인
-        msg_body = data.get('ServiceResult', {}).get('msgBody', {})
-        item_list = msg_body.get('itemList', [])
+        # XML 구조를 기반으로 원하는 데이터 추출
+        msg_body = root.find(".//msgBody")
+        if msg_body is not None:
+            item_list = msg_body.findall(".//itemList")
 
-        if not item_list:
-            print("데이터가 없습니다.")
+            if item_list:
+                for item in item_list:
+                    bus_number = item.findtext('plainNo', '')
+                    bus_location = item.findtext('tmX', ''), item.findtext('tmY', '')
+
+                    print(f"버스 번호: {bus_number}, 위치: {bus_location}")
+            else:
+                print("데이터가 없습니다.")
         else:
-            for item in item_list:
-                bus_number = item.get('plainNo', '')
-                bus_location = item.get('tmX', ''), item.get('tmY', '')
-
-                print(f"버스 번호: {bus_number}, 위치: {bus_location}")
-   
-   except JSONDecodeError as e:
-        print(f"JSON 디코딩 오류: {e}")
-        print(response.text)  # 오류 발생 시 응답 텍스트 출력
+            print("응답 데이터의 구조가 예상과 다릅니다.")
+    except ET.ParseError as e:
+        print(f"XML 파싱 오류: {e}")
 else:
     print(f"API 요청 실패: {response.status_code}")
-    print(response.text)  # 실패 시 응답 텍스트 출력
+    print(response.text)
