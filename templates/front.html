@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Information</title>
+</head>
+<body>
+    <h1>Bus Information</h1>
+    <div id="bus-info">
+        {% for bus in bus_data %}
+            <p>버스 번호: {{ bus['bus_number'] }}</p>
+            <p>위치: X: {{ bus['bus_location'][0] }}, Y: {{ bus['bus_location'][1] }}</p>
+            <hr>
+        {% endfor %}
+    </div>
+</body>
+</html>
